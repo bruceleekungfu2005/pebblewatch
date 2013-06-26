@@ -32,9 +32,13 @@ module Pebble
     end
 
     def connect
-      @serial_port = SerialPort.new(@port, baudrate: 115200)
-      @serial_port.read_timeout = 500
-
+      if @port.is_a?(String)
+        @serial_port = SerialPort.new(@port, baudrate: 115200)
+        @serial_port.read_timeout = 500
+      else
+        @serial_port = @port
+      end
+      
       @connected = true
       Pebble.logger.debug "Connected to port #{@port}"
       
