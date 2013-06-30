@@ -1,5 +1,3 @@
-require "serialport"
-
 module Pebble
   class Protocol
     module Errors
@@ -33,6 +31,7 @@ module Pebble
 
     def connect
       if @port.is_a?(String)
+        require "serialport"
         @serial_port = SerialPort.new(@port, baudrate: 115200)
         @serial_port.read_timeout = 500
       else
