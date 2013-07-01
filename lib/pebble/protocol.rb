@@ -128,6 +128,7 @@ module Pebble
           raise Errors::MalformedResponse if header.length < 4
 
           size, endpoint = header.unpack("S>S>")
+          next if endpoint == 0
           message = @serial_port.read(size)
 
           Pebble.logger.debug "Received #{Endpoints.for_code(endpoint) || endpoint}: #{message.inspect}"
