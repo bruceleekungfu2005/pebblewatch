@@ -31,9 +31,8 @@ module Pebble
 
     def connect
       if @port.is_a?(String)
-        require "serialport"
+        require 'serialport'
         @serial_port = SerialPort.new(@port, baudrate: 115200)
-        @serial_port.read_timeout = 500
       else
         @serial_port = @port
       end
@@ -44,6 +43,8 @@ module Pebble
       @receive_messages_thread = Thread.new(&method(:receive_messages))
 
       true
+    rescue LoadError
+      puts "Please 'gem install hybridgroup-serialport' for serial port support."      
     end
 
     def disconnect

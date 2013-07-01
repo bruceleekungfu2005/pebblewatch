@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files    = Dir.glob("spec/**/*")
   s.require_path  = "lib"
 
-  s.add_runtime_dependency("serialport", "~> 1.1") if RUBY_ENGINE == 'ruby'
+  s.add_runtime_dependency("hybridgroup-serialport", "~> 1.2") if RUBY_ENGINE == 'ruby'
   
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
