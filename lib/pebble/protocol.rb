@@ -8,6 +8,7 @@ module Pebble
 
     attr_reader :connected
     attr_reader :message_handlers
+    attr_reader :messages
 
     def self.open(port)
       protocol = new(port)
@@ -27,6 +28,8 @@ module Pebble
       @connected          = false
       @send_message_mutex = Mutex.new
       @message_handlers   = Hash.new { |hash, key| hash[key] = [] }
+      @messages = Queue.new
+      @use_message_queue = false
     end
 
     def connect
@@ -58,10 +61,15 @@ module Pebble
       true
     end
 
-    def listen_for_messages
+    def listen_for_messages(sync=true)
       raise Errors::NotConnected unless @connected
 
-      @receive_messages_thread.join
+      if sync
+        @receive_messages_thread.join
+      else
+        @use_message_queue = true
+        @receive_messages_thread.run
+      end
     end
 
     def on_receive(endpoint = :any, &handler)
@@ -147,6 +155,8 @@ module Pebble
       end
 
       def trigger_received(endpoint, message)
+        @messages << [endpoint, message] if @use_message_queue
+
         @message_handlers[:any].each do |handler|
           Thread.new(handler) do |handler|
             handler.call(endpoint, message)

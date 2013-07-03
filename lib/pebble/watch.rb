@@ -62,11 +62,12 @@ module Pebble
       @protocol.disconnect
     end
 
-    def listen_for_events
-      @protocol.listen_for_messages
+    def listen_for_events(sync=true)
+      @protocol.listen_for_messages(sync)
     end
 
     def on_event(event = :any, &handler)
+      Pebble.logger.info "adding handler for #{event}"
       @event_handlers[event] << handler
       handler
     end
