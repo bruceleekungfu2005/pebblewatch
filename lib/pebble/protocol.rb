@@ -155,7 +155,7 @@ module Pebble
       end
 
       def trigger_received(endpoint, message)
-        @messages << [endpoint, message] if @use_message_queue
+        @messages.push(event_for(endpoint, message)) if @use_message_queue
 
         @message_handlers[:any].each do |handler|
           Thread.new(handler) do |handler|
@@ -168,6 +168,17 @@ module Pebble
             handler.call(message)
           end
         end
+      end
+
+      def event_for(endpoint, message)
+        events = {
+          Pebble::Endpoints::LOGS => [:log, Pebble::Watch::LogEvent],
+          Pebble::Endpoints::SYSTEM_MESSAGE => [:system_message, Pebble::Watch::SystemMessageEvent],
+          Pebble::Endpoints::MUSIC_CONTROL => [:media_control, Pebble::Watch::MediaControlEvent],
+          Pebble::Endpoints::APPLICATION_MESSAGE => [:app_message, Pebble::Watch::AppMessageEvent]
+        }
+
+        [events[endpoint][0], events[endpoint][1].parse(message)]
       end
   end
 end
